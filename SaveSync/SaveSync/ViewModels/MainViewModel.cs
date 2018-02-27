@@ -115,7 +115,7 @@ namespace SaveSync.ViewModels
 
 
     #region private methods
-
+    //test
     private List<MappingViewModel> CreateMappingVms(List<FolderMapping> mappings)
     {
       var results = new List<MappingViewModel>();
