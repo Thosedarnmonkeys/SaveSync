@@ -113,7 +113,6 @@ namespace SaveSync.ViewModels
     }
     #endregion
 
-
     #region private methods
     private List<MappingViewModel> CreateMappingVms(List<FolderMapping> mappings)
     {
@@ -128,9 +127,12 @@ namespace SaveSync.ViewModels
         vm.Mapping = mapping;
 
         if (Connected)
+          vm.ServerAge = serverConnection.LatestSync(mapping);
 
         results.Add(vm);
       }
+
+      return results;
     }
     
 
@@ -140,9 +142,7 @@ namespace SaveSync.ViewModels
       {
         case ConnectionType.Ftp:
           return new FtpServerConnection(Hostname, Username, FileRoot);
-          break;
         case ConnectionType.Http:
-          break;
         default:
           throw new ArgumentOutOfRangeException();
       }
