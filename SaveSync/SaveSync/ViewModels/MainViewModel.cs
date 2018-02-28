@@ -91,6 +91,30 @@ namespace SaveSync.ViewModels
         DependencyProperty.Register("Connected", typeof(bool), typeof(MainViewModel), new PropertyMetadata(false));
     #endregion
 
+    #region FtpUsername
+    public string FtpUsername
+    {
+      get { return (string)GetValue(FtpUsernameProperty); }
+      set { SetValue(FtpUsernameProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for FtpUsername.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty FtpUsernameProperty =
+        DependencyProperty.Register("FtpUsername", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+    #endregion
+
+    #region FtpPassword
+    public string FtpPassword
+    {
+      get { return (string)GetValue(FtpPasswordProperty); }
+      set { SetValue(FtpPasswordProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for FtpPassword.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty FtpPasswordProperty =
+        DependencyProperty.Register("FtpPassword", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+    #endregion
+
     public List<MappingViewModel> Mappings { get; set; }
     #endregion
 
@@ -101,18 +125,17 @@ namespace SaveSync.ViewModels
       Hostname = config.Hostname;
       Username = config.Username;
       FileRoot = config.FileRoot;
+      FtpUsername = config.FtpUsername;
+      FtpPassword = config.FtpPassword;
       ConnectionType = config.ConnectionType;
-
-      List<FolderMapping> mappings = config.Mappings;
-      PopulateMappingServerPath(mappings, FileRoot);
-      Mappings = CreateMappingVms(mappings);
+      Mappings = CreateMappingVms(config.Mappings);
 
       if (!string.IsNullOrWhiteSpace(Hostname)
           && !string.IsNullOrWhiteSpace(Username)
           && !string.IsNullOrWhiteSpace(FileRoot))
       {
         serverConnection = CreateServerConnection(ConnectionType);
-        Connected = serverConnection.TestConnection();
+        Connected = serverConnection.TestConnection().Result;
       }
     }
     #endregion
@@ -131,7 +154,7 @@ namespace SaveSync.ViewModels
         vm.Mapping = mapping;
 
         if (Connected)
-          vm.ServerAge = serverConnection.LatestSync(mapping);
+          vm.ServerAge = serverConnection.LatestSync(mapping).Result;
 
         results.Add(vm);
       }
@@ -144,21 +167,10 @@ namespace SaveSync.ViewModels
       switch (connectionType)
       {
         case ConnectionType.Ftp:
-          return new FtpServerConnection(Hostname, Username, FileRoot);
+          return new FtpServerConnection(Hostname, Username, FileRoot, FtpUsername, FtpPassword, UpdateProgress);
         case ConnectionType.Http:
         default:
           throw new ArgumentOutOfRangeException();
-      }
-    }
-
-    private void PopulateMappingServerPath(List<FolderMapping> mappings, string serverFolderRoot)
-    {
-      if (mappings == null || serverFolderRoot == null)
-        return;
-
-      foreach (FolderMapping mapping in mappings)
-      {
-        mapping.ServerSidePath = serverFolderRoot + Path.DirectorySeparatorChar + mapping.FriendlyName;
       }
     }
 
@@ -168,6 +180,11 @@ namespace SaveSync.ViewModels
         return;
 
       serverConnection.UploadFolder(mapping);
+    }
+
+    private void UpdateProgress(int i)
+    {
+      OperationProgress = i;
     }
     #endregion
   }

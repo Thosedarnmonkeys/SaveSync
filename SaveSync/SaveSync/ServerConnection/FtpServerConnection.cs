@@ -53,7 +53,7 @@ namespace SaveSync.ServerConnection
 
     public Task<DateTime> LatestSync(FolderMapping mapping)
     {
-      
+     throw new NotImplementedException(); 
     }
 
     public async Task UploadFolder(FolderMapping mapping)

@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<SyncConfig xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Hostname="a server" Username="a user" FileRoot="a root" ConnectionType="Http" FtpUsername="ftper" FtpPassword="ftpwd">
+  <Mappings>
+    <FolderMapping FriendlyName="A folder" ClientSidePath="a path" />
+    <FolderMapping FriendlyName="Another folder" ClientSidePath="another path" />
+    <FolderMapping FriendlyName="A third folder" ClientSidePath="a third path" />
+  </Mappings>
+</SyncConfig>
