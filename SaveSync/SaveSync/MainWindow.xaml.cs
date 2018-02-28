@@ -12,6 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using SaveSync.Config;
+using SaveSync.ViewModels;
 
 namespace SaveSync
 {
@@ -23,6 +25,8 @@ namespace SaveSync
     public MainWindow()
     {
       InitializeComponent();
+      SyncConfig config = ConfigManager.ReadConfig();
+      DataContext = new MainViewModel(config);
     }
   }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -27,7 +28,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for Hostname.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty HostnameProperty =
-        DependencyProperty.Register("Hostname", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
+        DependencyProperty.Register("Hostname", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
     #endregion
 
     #region Username
@@ -39,7 +40,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for Username.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty UsernameProperty =
-        DependencyProperty.Register("Username", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
+        DependencyProperty.Register("Username", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
     #endregion
 
     #region Operation Progress
@@ -63,7 +64,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for FileRoot.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty FileRootProperty =
-        DependencyProperty.Register("FileRoot", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
+        DependencyProperty.Register("FileRoot", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
     #endregion
 
     #region Connection Type
@@ -75,7 +76,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for ConnectionType.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty ConnectionTypeProperty =
-        DependencyProperty.Register("ConnectionType", typeof(ConnectionType), typeof(MainViewModel), new PropertyMetadata(ConnectionType.Ftp, CriticalPropertyChangedCallback));
+        DependencyProperty.Register("ConnectionType", typeof(ConnectionType), typeof(MainViewModel), new PropertyMetadata(ConnectionType.Ftp));
     #endregion
 
     #region Connected
@@ -101,7 +102,10 @@ namespace SaveSync.ViewModels
       Username = config.Username;
       FileRoot = config.FileRoot;
       ConnectionType = config.ConnectionType;
-      Mappings = CreateMappingVms(config.Mappings);
+
+      List<FolderMapping> mappings = config.Mappings;
+      PopulateMappingServerPath(mappings, FileRoot);
+      Mappings = CreateMappingVms(mappings);
 
       if (!string.IsNullOrWhiteSpace(Hostname)
           && !string.IsNullOrWhiteSpace(Username)
@@ -134,7 +138,6 @@ namespace SaveSync.ViewModels
 
       return results;
     }
-    
 
     private IServerConnection CreateServerConnection(ConnectionType connectionType)
     {
@@ -148,12 +151,23 @@ namespace SaveSync.ViewModels
       }
     }
 
-    private static void CriticalPropertyChangedCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    private void PopulateMappingServerPath(List<FolderMapping> mappings, string serverFolderRoot)
     {
-      if (o is MainViewModel vm)
+      if (mappings == null || serverFolderRoot == null)
+        return;
+
+      foreach (FolderMapping mapping in mappings)
       {
-        vm.Connected = false;
+        mapping.ServerSidePath = serverFolderRoot + Path.DirectorySeparatorChar + mapping.FriendlyName;
       }
+    }
+
+    private void UploadFolder(FolderMapping mapping)
+    {
+      if (mapping == null || serverConnection == null)
+        return;
+
+      serverConnection.UploadFolder(mapping);
     }
     #endregion
   }

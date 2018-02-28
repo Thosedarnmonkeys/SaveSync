@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 namespace SaveSync.Mapping
 {
@@ -10,6 +11,5 @@ namespace SaveSync.Mapping
   {
     public string FriendlyName { get; set; }
     public string ClientSidePath { get; set; }
-    public string ServerSidePath { get; set; }
   }
 }

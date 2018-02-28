@@ -10,11 +10,12 @@ namespace SaveSync.ServerConnection
 {
   public interface IServerConnection
   {
-    bool TestConnection();
-    DateTime LatestSync(FolderMapping mapping);
-    void UploadFolder(FolderMapping mapping);
-    void UploadFolders(List<FolderMapping> mappings);
-    void DownloadFolder(FolderMapping mapping);
-    void DownloadFolders(List<FolderMapping> mappings);
+    Task<bool> TestConnection();
+    Task<DateTime> LatestSync(FolderMapping mapping);
+    Task UploadFolder(FolderMapping mapping);
+    Task UploadFolders(List<FolderMapping> mappings);
+    Task DownloadFolder(FolderMapping mapping);
+    Task DownloadFolders(List<FolderMapping> mappings);
+    Task CloseConnection();
   }
 }
