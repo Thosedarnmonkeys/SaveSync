@@ -4,34 +4,40 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SaveSync"
+        xmlns:views="clr-namespace:SaveSync.Views"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="700" Width="1000">
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <!--top grid containing login and connection info-->
     <Grid>
-        <Grid.RowDefinitions>
-          <RowDefinition Height="Auto"/>
-          <RowDefinition Height="*"/>
-          <RowDefinition Height="Auto"/>
-        </Grid.RowDefinitions>
-        
-        <!--top grid containing login and connection info-->
-        <Grid>
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-          </Grid.ColumnDefinitions>
-          
-        </Grid>
-      
-        <!--middle section showing folder mappings-->
-        <ListBox Grid.Row="1">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="Auto"/>
+      </Grid.ColumnDefinitions>
+      <Grid.RowDefinitions>
 
-        </ListBox>
-      
-        <!--bottom section showing progress bar and sync button-->
-        <StackPanel Grid.Row="2">
-
-        </StackPanel>
+      </Grid.RowDefinitions>
+      <views:LabelledTextBox Label="User:" Text="{Binding Username}" Margin="15"/>
+      <views:LabelledTextBox Label="Host:" Text="{Binding Hostname}" Margin="15" Grid.Column="1"/>
+      <views:LabelledTextBox Label="File Root:" Text="{Binding FileRoot}" Margin="15" Grid.Column="2"/>
     </Grid>
+
+    <!--middle section showing folder mappings-->
+    <ListBox Grid.Row="1">
+
+    </ListBox>
+
+    <!--bottom section showing progress bar and sync button-->
+    <StackPanel Grid.Row="2">
+
+    </StackPanel>
+  </Grid>
 </Window>

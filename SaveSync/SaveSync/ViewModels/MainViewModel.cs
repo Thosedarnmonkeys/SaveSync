@@ -210,7 +210,7 @@ namespace SaveSync.ViewModels
 
     private static void CriticalPropertyChangedCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
     {
-      if (o is MainViewModel vm)
+      if (o is MainViewModel vm && vm.ConnectCommand != null)
       {
         vm.ConnectCommand.RaiseCanExecuteChanged();
       }
