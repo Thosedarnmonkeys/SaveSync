@@ -10,7 +10,7 @@ using SaveSync.Config;
 using SaveSync.Mapping;
 using SaveSync.ServerConnection;
 
-namespace SaveSyncTests
+namespace SaveSyncTests.Tests
 {
   [TestClass]
   public class ConfigManagerTests

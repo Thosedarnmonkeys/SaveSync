@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SaveSync.Utils;
 
-namespace SaveSyncTests
+namespace SaveSyncTests.Tests
 {
   [TestClass]
   public class ProgressBarStepperTests
