@@ -22,7 +22,7 @@ namespace SaveSync.ServerConnection
     private Action<int> progressUpdateAction;
     #endregion
 
-    private string folderRoot => fileRoot + Path.PathSeparator + username + Path.PathSeparator;
+    private string folderRoot => fileRoot + Path.DirectorySeparatorChar + username + Path.DirectorySeparatorChar;
 
     #region constructor
     public FtpServerConnection(string hostname, string username, string fileRoot, string ftpUsername, string ftpPassword, Action<int> progressUpdateAction)
@@ -60,11 +60,11 @@ namespace SaveSync.ServerConnection
     {
       progressUpdateAction.Invoke(0);
 
-      string[] files = Directory.GetFiles(mapping.ClientSidePath, "*.*", SearchOption.AllDirectories);
+      string[] files = Directory.GetFiles(mapping.ClientSidePath, "*", SearchOption.AllDirectories);
       var stepper = new ProgressBarStepper(files.Length);
       foreach (string file in files)
       {
-        string uploadPath = folderRoot + mapping.FriendlyName + Path.PathSeparator + file;
+        string uploadPath = folderRoot + mapping.FriendlyName + Path.DirectorySeparatorChar + file;
         await client.UploadFileAsync(mapping.ClientSidePath, uploadPath, FtpExists.Overwrite, true, FtpVerify.Retry);
         progressUpdateAction.Invoke(stepper.Step());
       }

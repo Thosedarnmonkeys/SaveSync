@@ -49,6 +49,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tests\ConfigManagerTests.cs" />
+    <Compile Include="Tests\MainViewModelTests.cs" />
     <Compile Include="Tests\ProgressBarStepperTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

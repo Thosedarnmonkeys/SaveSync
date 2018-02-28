@@ -8,6 +8,7 @@ using System.Windows;
 using SaveSync.Config;
 using SaveSync.Mapping;
 using SaveSync.ServerConnection;
+using SaveSync.Utils;
 
 namespace SaveSync.ViewModels
 {
@@ -28,7 +29,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for Hostname.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty HostnameProperty =
-        DependencyProperty.Register("Hostname", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+        DependencyProperty.Register("Hostname", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
     #region Username
@@ -40,7 +41,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for Username.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty UsernameProperty =
-        DependencyProperty.Register("Username", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+        DependencyProperty.Register("Username", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
     #region Operation Progress
@@ -64,7 +65,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for FileRoot.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty FileRootProperty =
-        DependencyProperty.Register("FileRoot", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+        DependencyProperty.Register("FileRoot", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
     #region Connection Type
@@ -76,7 +77,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for ConnectionType.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty ConnectionTypeProperty =
-        DependencyProperty.Register("ConnectionType", typeof(ConnectionType), typeof(MainViewModel), new PropertyMetadata(ConnectionType.Ftp));
+        DependencyProperty.Register("ConnectionType", typeof(ConnectionType), typeof(MainViewModel), new PropertyMetadata(ConnectionType.Ftp, CriticalPropertyChangedCallback));
     #endregion
 
     #region Connected
@@ -100,7 +101,7 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for FtpUsername.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty FtpUsernameProperty =
-        DependencyProperty.Register("FtpUsername", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+        DependencyProperty.Register("FtpUsername", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
     #region FtpPassword
@@ -112,8 +113,10 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for FtpPassword.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty FtpPasswordProperty =
-        DependencyProperty.Register("FtpPassword", typeof(string), typeof(MainViewModel), new PropertyMetadata(null));
+        DependencyProperty.Register("FtpPassword", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
+
+    public DelegateCommand ConnectCommand { get; private set; }
 
     public List<MappingViewModel> Mappings { get; set; }
     #endregion
@@ -130,13 +133,7 @@ namespace SaveSync.ViewModels
       ConnectionType = config.ConnectionType;
       Mappings = CreateMappingVms(config.Mappings);
 
-      if (!string.IsNullOrWhiteSpace(Hostname)
-          && !string.IsNullOrWhiteSpace(Username)
-          && !string.IsNullOrWhiteSpace(FileRoot))
-      {
-        serverConnection = CreateServerConnection(ConnectionType);
-        Connected = serverConnection.TestConnection().Result;
-      }
+      ConnectCommand = new DelegateCommand(Connect, CanConnect);
     }
     #endregion
 
@@ -152,31 +149,16 @@ namespace SaveSync.ViewModels
       {
         var vm = new MappingViewModel();
         vm.Mapping = mapping;
-
-        if (Connected)
-          vm.ServerAge = serverConnection.LatestSync(mapping).Result;
-
+        vm.ClientAge = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
         results.Add(vm);
       }
 
       return results;
     }
 
-    private IServerConnection CreateServerConnection(ConnectionType connectionType)
-    {
-      switch (connectionType)
-      {
-        case ConnectionType.Ftp:
-          return new FtpServerConnection(Hostname, Username, FileRoot, FtpUsername, FtpPassword, UpdateProgress);
-        case ConnectionType.Http:
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-    }
-
     private void UploadFolder(FolderMapping mapping)
     {
-      if (mapping == null || serverConnection == null)
+      if (mapping == null || serverConnection == null || !Connected)
         return;
 
       serverConnection.UploadFolder(mapping);
@@ -185,6 +167,42 @@ namespace SaveSync.ViewModels
     private void UpdateProgress(int i)
     {
       OperationProgress = i;
+    }
+
+    private void Connect()
+    {
+
+    }
+
+    private bool CanConnect()
+    {
+      if (string.IsNullOrWhiteSpace(Hostname)
+          || string.IsNullOrWhiteSpace(Username)
+          || string.IsNullOrWhiteSpace(FileRoot))
+        return false;
+
+      switch (ConnectionType)
+      {
+        case ConnectionType.Ftp:
+          if (string.IsNullOrWhiteSpace(FtpUsername) || string.IsNullOrWhiteSpace(FtpPassword))
+            return false;
+          break;
+        case ConnectionType.Http:
+          return false;
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+
+      return true;
+    }
+
+    private static void CriticalPropertyChangedCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    {
+      if (o is MainViewModel vm)
+      {
+        vm.ConnectCommand.RaiseCanExecuteChanged();
+      }
     }
     #endregion
   }
