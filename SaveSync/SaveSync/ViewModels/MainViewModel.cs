@@ -116,7 +116,7 @@ namespace SaveSync.ViewModels
         DependencyProperty.Register("FtpPassword", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
-    public DelegateCommand ConnectCommand { get; private set; }
+    public AsyncDelegateCommand ConnectCommand { get; private set; }
 
     public List<MappingViewModel> Mappings { get; set; }
     #endregion
@@ -133,7 +133,7 @@ namespace SaveSync.ViewModels
       ConnectionType = config.ConnectionType;
       Mappings = CreateMappingVms(config.Mappings);
 
-      ConnectCommand = new DelegateCommand(Connect, CanConnect);
+      ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
     }
     #endregion
 
@@ -169,9 +169,20 @@ namespace SaveSync.ViewModels
       OperationProgress = i;
     }
 
-    private void Connect()
+    private async Task Connect()
     {
+      switch (ConnectionType)
+      {
+        case ConnectionType.Ftp:
+          serverConnection = new FtpServerConnection(Hostname, Username, FileRoot, FtpUsername, FtpPassword, UpdateProgress);
+          break;
+        case ConnectionType.Http:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
 
+      Connected = await serverConnection.TestConnection();
     }
 
     private bool CanConnect()

@@ -66,6 +66,7 @@
     <Compile Include="ServerConnection\ConnectionType.cs" />
     <Compile Include="ServerConnection\FtpServerConnection.cs" />
     <Compile Include="ServerConnection\IServerConnection.cs" />
+    <Compile Include="Utils\AsyncDelegateCommand.cs" />
     <Compile Include="Utils\DelegateCommand.cs" />
     <Compile Include="Utils\DirUtils.cs" />
     <Compile Include="Utils\ProgressBarStepper.cs" />

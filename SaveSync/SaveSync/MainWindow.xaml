@@ -7,6 +7,31 @@
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="525">
     <Grid>
+        <Grid.RowDefinitions>
+          <RowDefinition Height="Auto"/>
+          <RowDefinition Height="*"/>
+          <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
         
+        <!--top grid containing login and connection info-->
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          
+        </Grid>
+      
+        <!--middle section showing folder mappings-->
+        <ListBox Grid.Row="1">
+
+        </ListBox>
+      
+        <!--bottom section showing progress bar and sync button-->
+        <StackPanel Grid.Row="2">
+
+        </StackPanel>
     </Grid>
 </Window>

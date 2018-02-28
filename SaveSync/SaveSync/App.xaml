@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:SaveSync"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+         <UserControl x:Key="LabeledTextBoxControl">
+            
+         </UserControl>
     </Application.Resources>
 </Application>
