@@ -75,6 +75,7 @@
     <Compile Include="Views\LabelledTextBox.xaml.cs">
       <DependentUpon>LabelledTextBox.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Resources\BoolToVisibilityConverter.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

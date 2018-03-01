@@ -5,8 +5,28 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SaveSync"
         xmlns:views="clr-namespace:SaveSync.Views"
+        xmlns:res="clr-namespace:SaveSync.Views.Resources"
+        xmlns:sys="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
         Title="MainWindow" Height="700" Width="1000">
+  <Window.Resources>
+
+    <sys:Boolean x:Key="TrueBool">
+      True
+    </sys:Boolean>
+    
+    <sys:Boolean x:Key="FalseBool">
+      False
+    </sys:Boolean>
+    
+    <res:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+
+    <Style TargetType="views:LabelledTextBox">
+      <Setter Property="Margin" Value="15"/>
+    </Style>
+
+  </Window.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -23,11 +43,18 @@
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
       <Grid.RowDefinitions>
-
+        <RowDefinition/>
+        <RowDefinition/>
       </Grid.RowDefinitions>
-      <views:LabelledTextBox Label="User:" Text="{Binding Username}" Margin="15"/>
-      <views:LabelledTextBox Label="Host:" Text="{Binding Hostname}" Margin="15" Grid.Column="1"/>
-      <views:LabelledTextBox Label="File Root:" Text="{Binding FileRoot}" Margin="15" Grid.Column="2"/>
+      <views:LabelledTextBox Label="User:" Text="{Binding Username}"/>
+      <views:LabelledTextBox Label="Host:" Text="{Binding Hostname}" Grid.Column="1"/>
+      <views:LabelledTextBox Label="File Root:" Text="{Binding FileRoot}" Grid.Column="2"/>
+      <views:LabelledTextBox Label="Ftp Username:" Text="{Binding FtpUsername}" Grid.Column="1" Grid.Row="1"/>
+      <views:LabelledTextBox Label="Ftp Password:" Text="{Binding FtpPassword}" Grid.Column="2" Grid.Row="1"/>
+      <Button Grid.Column="3" Grid.RowSpan="2" Command="{Binding ConnectCommand}" Content="Connect" Padding="5" Margin="15" 
+              Visibility="{Binding Connected, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource FalseBool}}"/>
+      <Button Grid.Column="3" Grid.RowSpan="2" Command="{Binding DisconnectCommand}" Content="Disconnect" Padding="5" Margin="15" 
+              Visibility="{Binding Connected, Converter={StaticResource BoolToVisibilityConverter}, ConverterParameter={StaticResource TrueBool}}"/>
     </Grid>
 
     <!--middle section showing folder mappings-->
