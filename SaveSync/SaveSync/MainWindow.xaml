@@ -46,7 +46,7 @@
         <RowDefinition/>
         <RowDefinition/>
       </Grid.RowDefinitions>
-      <views:LabelledTextBox Label="User:" Text="{Binding Username}"/>
+      <views:LabelledTextBox Label="User:" Text="{Binding Username, UpdateSourceTrigger=PropertyChanged}"/>
       <views:LabelledTextBox Label="Host:" Text="{Binding Hostname}" Grid.Column="1"/>
       <views:LabelledTextBox Label="File Root:" Text="{Binding FileRoot}" Grid.Column="2"/>
       <views:LabelledTextBox Label="Ftp Username:" Text="{Binding FtpUsername}" Grid.Column="1" Grid.Row="1"/>

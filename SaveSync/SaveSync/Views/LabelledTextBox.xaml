@@ -11,6 +11,6 @@
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
     <Label Content="{Binding Label, RelativeSource={RelativeSource AncestorType=local:LabelledTextBox}}"/>
-    <TextBox Grid.Column="1" Text="{Binding Text, RelativeSource={RelativeSource AncestorType=local:LabelledTextBox}}"/>
+    <TextBox Grid.Column="1" Text="{Binding Text, RelativeSource={RelativeSource AncestorType=local:LabelledTextBox}, UpdateSourceTrigger=PropertyChanged}"/>
   </Grid>
 </UserControl>

@@ -7,19 +7,19 @@ using System.Windows.Input;
 
 namespace SaveSync.Utils
 {
-  public class AsyncDelegateCommand : ICommand
+  public class DelegateCommand : ICommand
   {
     private readonly Func<bool> canExecute;
-    private readonly Func<Task> execute;
+    private readonly Action execute;
 
     public event EventHandler CanExecuteChanged;
 
-    public AsyncDelegateCommand(Func<Task> execute)
+    public DelegateCommand(Action execute)
       : this(execute, null)
     {
     }
 
-    public AsyncDelegateCommand(Func<Task> execute, Func<bool> canExecute)
+    public DelegateCommand(Action execute, Func<bool> canExecute)
     {
       this.execute = execute;
       this.canExecute = canExecute;
@@ -35,9 +35,9 @@ namespace SaveSync.Utils
       return canExecute.Invoke();
     }
 
-    public async void Execute(object parameter)
+    public void Execute(object parameter)
     {
-      await execute.Invoke();
+      execute.Invoke();
     }
 
     public void RaiseCanExecuteChanged()
