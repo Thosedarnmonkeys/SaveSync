@@ -14,11 +14,11 @@
     <sys:Boolean x:Key="TrueBool">
       True
     </sys:Boolean>
-    
+
     <sys:Boolean x:Key="FalseBool">
       False
     </sys:Boolean>
-    
+
     <res:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
 
     <Style TargetType="Label" x:Key="PropertyLabelStyle">
@@ -30,7 +30,7 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
-    
+
     <Style TargetType="TextBox" x:Key="PropertyTextBoxStyle">
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Margin" Value="5,10"/>
@@ -40,7 +40,7 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
-    
+
     <Style TargetType="PasswordBox" x:Key="PropertyPasswordBoxStyle">
       <Setter Property="VerticalContentAlignment" Value="Center"/>
       <Setter Property="Margin" Value="5,10"/>
@@ -50,6 +50,43 @@
         </DataTrigger>
       </Style.Triggers>
     </Style>
+
+    <DataTemplate x:Key="MappingListDateTemplate">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="2*"/>
+          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="{Binding Mapping.FriendlyName}" HorizontalAlignment="Left"/>
+        <Label Content="{Binding Mapping.ClientSidePath}" Grid.Column="1" HorizontalAlignment="Left"/>
+        <StackPanel Orientation="Horizontal" Grid.Column="2">
+          <Label Content="Local" Margin="0,0,5,0"/>
+          <StackPanel Orientation="Vertical">
+            <Label x:Name="LocalNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
+            <Label Content="{Binding ClientAgeString}"/>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" Grid.Column="3">
+          <Label Content="Remote" Margin="0,0,5,0"/>
+          <StackPanel Orientation="Vertical">
+            <Label x:Name="RemoteNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
+            <Label Content="{Binding ServerAgeString}"/>
+          </StackPanel>
+        </StackPanel>
+      </Grid>
+      <DataTemplate.Triggers>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="True">
+          <Setter TargetName="RemoteNewerOrOlderLabel"  Property="Foreground" Value="Red"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel"  Property="Content" Value="Older"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="False">
+          <Setter TargetName="LocalNewerOrOlderLabel"  Property="Foreground" Value="Red"/>
+          <Setter TargetName="LocalNewerOrOlderLabel"  Property="Content" Value="Older"/>
+        </DataTrigger>
+      </DataTemplate.Triggers>
+    </DataTemplate>
 
   </Window.Resources>
 
@@ -97,9 +134,7 @@
     </Grid>
 
     <!--middle section showing folder mappings-->
-    <ListBox Grid.Row="1">
-
-    </ListBox>
+    <ListBox Grid.Row="1" ItemsSource="{Binding Mappings}" ItemTemplate="{StaticResource MappingListDateTemplate}" Margin="15"/>
 
     <!--bottom section showing progress bar and sync button-->
     <StackPanel Grid.Row="2">
