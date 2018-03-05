@@ -27,6 +27,17 @@ namespace SaveSync
       InitializeComponent();
       SyncConfig config = ConfigManager.ReadConfig();
       DataContext = new MainViewModel(config);
+      Closing += WriteConfig;
+    }
+
+    private void WriteConfig(object o, EventArgs e)
+    {
+      ((MainViewModel) DataContext).WriteConfig();
+    }
+
+    private void FtpPasswordBox_OnPasswordChanged(object sender, RoutedEventArgs e)
+    {
+      ((MainViewModel) DataContext).FtpPassword = FtpPasswordBox.Password;
     }
   }
 }

@@ -21,8 +21,6 @@ namespace SaveSync.Config
     public ConnectionType ConnectionType { get; set; }
     [XmlAttribute]
     public string FtpUsername { get; set; }
-    [XmlAttribute]
-    public string FtpPassword { get; set; }
     public List<FolderMapping> Mappings { get; set; }
 
     public override bool Equals(object o)
@@ -44,9 +42,6 @@ namespace SaveSync.Config
         return false;
 
       if (FtpUsername != other.FtpUsername)
-        return false;
-
-      if (FtpPassword != other.FtpPassword)
         return false;
 
       if (Mappings != null || other.Mappings != null)

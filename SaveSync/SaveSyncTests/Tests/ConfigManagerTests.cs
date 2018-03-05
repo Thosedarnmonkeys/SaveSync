@@ -25,7 +25,6 @@ namespace SaveSyncTests.Tests
         Username = "a user",
         ConnectionType = ConnectionType.Http,
         FtpUsername = "ftper",
-        FtpPassword = "ftpwd",
         Mappings = new List<FolderMapping>()
         {
           new FolderMapping(){FriendlyName = "A folder", ClientSidePath = "a path"},
@@ -49,7 +48,6 @@ namespace SaveSyncTests.Tests
         Username = "a user",
         ConnectionType = ConnectionType.Http,
         FtpUsername = "ftper",
-        FtpPassword = "ftpwd",
         Mappings = new List<FolderMapping>()
         {
           new FolderMapping(){FriendlyName = "A folder", ClientSidePath = "a path"},

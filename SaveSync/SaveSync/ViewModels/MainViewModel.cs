@@ -129,11 +129,30 @@ namespace SaveSync.ViewModels
       Username = config.Username;
       FileRoot = config.FileRoot;
       FtpUsername = config.FtpUsername;
-      FtpPassword = config.FtpPassword;
       ConnectionType = config.ConnectionType;
       Mappings = CreateMappingVms(config.Mappings);
 
       ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
+    }
+    #endregion
+
+    #region public methods
+
+    public void WriteConfig()
+    {
+      List<FolderMapping> mappings = Mappings.Select(vm => vm.Mapping).ToList();
+
+      SyncConfig config = new SyncConfig()
+      {
+        Username = Username,
+        Hostname = Hostname,
+        FileRoot = FileRoot,
+        ConnectionType = ConnectionType,
+        FtpUsername = FtpUsername,
+        Mappings = mappings
+      };
+
+      ConfigManager.WriteConfig(config);
     }
     #endregion
 
