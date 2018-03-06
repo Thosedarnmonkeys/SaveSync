@@ -7,12 +7,18 @@ using System.Windows;
 using System.Windows.Forms;
 using Microsoft.Win32;
 using SaveSync.Mapping;
+using SaveSync.ServerConnection;
 using SaveSync.Utils;
 
 namespace SaveSync.ViewModels
 {
   public class MappingViewModel : DependencyObject
   {
+    #region private fields
+    private IServerConnection connection;
+    #endregion
+
+    #region public properties
     public FolderMapping Mapping { get; set; }
 
     #region ServerAge
@@ -80,13 +86,22 @@ namespace SaveSync.ViewModels
     #endregion
 
     public DelegateCommand BrowseFolderCommand { get; private set; }
+    public AsyncDelegateCommand DownloadFolderCommand { get; private set; }
+    public AsyncDelegateCommand UploadFolderCommand { get; private set; }
+    #endregion
 
+    #region constructor
     public MappingViewModel()
     {
-      BrowseFolderCommand = new DelegateCommand(BrowseForFolder);
       Mapping = new FolderMapping();
+      BrowseFolderCommand = new DelegateCommand(BrowseForFolder);
+      DownloadFolderCommand = new AsyncDelegateCommand(DownloadFolder, CanRunConnectionTasks);
+      UploadFolderCommand = new AsyncDelegateCommand(UploadFolder, CanRunConnectionTasks);
     }
 
+    #endregion
+
+    #region private methods
     private void BrowseForFolder()
     {
       using (var fbd = new FolderBrowserDialog())
@@ -96,5 +111,21 @@ namespace SaveSync.ViewModels
           Mapping.ClientSidePath = fbd.SelectedPath;
       }
     }
+
+    private async Task DownloadFolder()
+    {
+      await connection.DownloadFolder(Mapping);
+    }
+
+    private async Task UploadFolder()
+    {
+      await connection.UploadFolder(Mapping);
+    }
+
+    private bool CanRunConnectionTasks()
+    {
+      return connection != null;
+    }
+    #endregion
   }
 }

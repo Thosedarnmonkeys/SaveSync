@@ -75,6 +75,10 @@
             <Label Content="{Binding ServerAgeString}" HorizontalAlignment="Center"/>
           </StackPanel>
         </StackPanel>
+        <Grid.InputBindings>
+          <MouseBinding Gesture="LeftDoubleClick" 
+                        Command="{Binding DataContext.EditMappingCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=ListBox}}"/>
+        </Grid.InputBindings>
       </Grid>
       <DataTemplate.Triggers>
         <DataTrigger Binding="{Binding LocalNewer}" Value="True">
@@ -145,7 +149,7 @@
       </Grid.RowDefinitions>
       <Button Content="Add New.." Command="{Binding NewMappingCommand}" HorizontalAlignment="Left" Margin="5" Padding="5,3"/>
       <Button Content="Delete" Command="{Binding DeleteMappingCommand}" HorizontalAlignment="Right" Margin="5" Padding="5,3" Background="Firebrick" Foreground="White"/>
-      <ListBox Grid.Row="1" ItemsSource="{Binding Mappings}" ItemTemplate="{StaticResource MappingListDateTemplate}" HorizontalContentAlignment="Stretch"/>
+      <ListBox Grid.Row="1" ItemsSource="{Binding Mappings}" ItemTemplate="{StaticResource MappingListDateTemplate}" SelectedItem="{Binding SelectedMapping}" HorizontalContentAlignment="Stretch"/>
     </Grid>
 
     <!--bottom section showing progress bar and sync button-->

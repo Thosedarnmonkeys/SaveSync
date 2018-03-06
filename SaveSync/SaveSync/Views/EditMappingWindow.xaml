@@ -76,7 +76,7 @@
             <Label Content="{Binding ClientAgeString}"/>
           </StackPanel>
         </StackPanel>
-        <Button Command="{Binding UploadLocalFolderCommand}" Content="Upload"/>
+        <Button Command="{Binding UploadFolderCommand}" Content="Upload"/>
       </StackPanel>
 
       <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Grid.Column="1">
@@ -87,7 +87,7 @@
             <Label Content="{Binding ServerAgeString}"/>
           </StackPanel>
         </StackPanel>
-        <Button Command="{Binding DownloadRemoteFolderCommand}" Content="Download"/>
+        <Button Command="{Binding DownloadFolderCommand}" Content="Download"/>
       </StackPanel>
       
       <Button Grid.Column="2" Click="OkButton_OnClick" Content="OK" Margin="5" Padding="5,3" VerticalAlignment="Bottom"/>

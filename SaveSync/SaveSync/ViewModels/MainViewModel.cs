@@ -121,9 +121,10 @@ namespace SaveSync.ViewModels
     #region Commands
     public AsyncDelegateCommand ConnectCommand { get; private set; } 
     public DelegateCommand NewMappingCommand { get; private set; }
+    public DelegateCommand EditMappingCommand { get; private set; }
     #endregion
 
-
+    public MappingViewModel SelectedMapping { get; set; }
     public ObservableCollection<MappingViewModel> Mappings { get; set; }
     #endregion
 
@@ -140,6 +141,7 @@ namespace SaveSync.ViewModels
 
       ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
       NewMappingCommand = new DelegateCommand(AddNewMapping);
+      EditMappingCommand = new DelegateCommand(() => EditMapping(SelectedMapping));
     }
     #endregion
 
@@ -229,6 +231,12 @@ namespace SaveSync.ViewModels
       }
     }
 
+    private void EditMapping(MappingViewModel vm)
+    {
+      var editWindow = new EditMappingWindow(vm);
+      editWindow.ShowDialog();
+    }
+
     #region server connection functions
     private async Task Connect()
     {
@@ -267,6 +275,7 @@ namespace SaveSync.ViewModels
     }
 
     #endregion    
+
     #endregion
   }
 }
