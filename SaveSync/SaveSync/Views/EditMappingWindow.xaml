@@ -5,7 +5,29 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SaveSync.Views"
         mc:Ignorable="d"
-        Title="EditMappingWindow" Height="200" Width="450">
+        Title="EditMappingWindow" Height="180" Width="450">
+  <Window.Resources>
+
+    <Style x:Key="RemoteLabelStyle" TargetType="Label">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="True">
+          <Setter Property="Foreground" Value="Red"/>
+          <Setter Property="Content" Value="Older"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+    <Style x:Key="LocalLabelStyle" TargetType="Label">
+      <Style.Triggers>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="False">
+          <Setter Property="Foreground" Value="Red"/>
+          <Setter Property="Content" Value="Older"/>
+        </DataTrigger>
+      </Style.Triggers>
+    </Style>
+
+  </Window.Resources>
+
   <Grid>
     <Grid.RowDefinitions>
       <RowDefinition Height="Auto"/>
@@ -37,6 +59,30 @@
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="Auto"/>
       </Grid.ColumnDefinitions>
+
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5">
+        <StackPanel Orientation="Horizontal">
+          <Label Content="Local"/>
+          <StackPanel Orientation="Vertical">
+            <Label Style="{StaticResource LocalLabelStyle}"  Content="Newer" Foreground="Green"/>
+            <Label Content="{Binding ClientAgeString}"/>
+          </StackPanel>
+        </StackPanel>
+        <Button Command="{Binding UploadLocalFolderCommand}" Content="Upload"/>
+      </StackPanel>
+
+      <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="5" Grid.Column="1">
+        <StackPanel Orientation="Horizontal">
+          <Label Content="Remote"/>
+          <StackPanel Orientation="Vertical">
+            <Label Style="{StaticResource RemoteLabelStyle}" Content="Newer" Foreground="Green"/>
+            <Label Content="{Binding ServerAgeString}"/>
+          </StackPanel>
+        </StackPanel>
+        <Button Command="{Binding DownloadRemoteFolderCommand}" Content="Download"/>
+      </StackPanel>
+      
+      <Button Grid.Column="2" Command="{Binding OkCommand}" Content="OK" Margin="5" Padding="5,3" VerticalAlignment="Bottom"/>
 
     </Grid>
 
