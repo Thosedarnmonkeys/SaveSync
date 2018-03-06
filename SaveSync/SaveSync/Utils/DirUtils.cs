@@ -14,14 +14,14 @@ namespace SaveSync.Utils
       if (path == null)
         return DateTime.MinValue;
 
-      if (!File.Exists(path))
+      if (!Directory.Exists(path))
         return DateTime.MinValue;
 
       DateTime latest = DateTime.MinValue;
       string[] files = Directory.GetFiles(path, "*", SearchOption.AllDirectories);
       foreach (string file in files)
       {
-        DateTime lastWrite = File.GetLastWriteTime(path + Path.DirectorySeparatorChar + file);
+        DateTime lastWrite = File.GetLastWriteTime(file);
         if (lastWrite > latest)
           latest = lastWrite;
       }

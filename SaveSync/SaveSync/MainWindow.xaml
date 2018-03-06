@@ -56,34 +56,38 @@
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="1*"/>
           <ColumnDefinition Width="2*"/>
-          <ColumnDefinition Width="Auto"/>
-          <ColumnDefinition Width="Auto"/>
+          <ColumnDefinition Width="1*"/>
+          <ColumnDefinition Width="1*"/>
         </Grid.ColumnDefinitions>
-        <Label Content="{Binding Mapping.FriendlyName}" HorizontalAlignment="Left"/>
-        <Label Content="{Binding Mapping.ClientSidePath}" Grid.Column="1" HorizontalAlignment="Left"/>
+        <Label Content="{Binding Mapping.FriendlyName}" HorizontalAlignment="Left" VerticalAlignment="Center"/>
+        <Label Content="{Binding Mapping.ClientSidePath}" Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center"/>
         <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="0,0,40,0">
           <Label Content="Local" Margin="0,0,5,0"/>
           <StackPanel Orientation="Vertical">
-            <Label x:Name="LocalNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
+            <Label x:Name="LocalNewerOrOlderLabel"/>
             <Label Content="{Binding ClientAgeString}" HorizontalAlignment="Center"/>
           </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Column="3">
           <Label Content="Remote" Margin="0,0,5,0"/>
           <StackPanel Orientation="Vertical">
-            <Label x:Name="RemoteNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
+            <Label x:Name="RemoteNewerOrOlderLabel"/>
             <Label Content="{Binding ServerAgeString}" HorizontalAlignment="Center"/>
           </StackPanel>
         </StackPanel>
       </Grid>
       <DataTemplate.Triggers>
         <DataTrigger Binding="{Binding LocalNewer}" Value="True">
-          <Setter TargetName="RemoteNewerOrOlderLabel"  Property="Foreground" Value="Red"/>
-          <Setter TargetName="RemoteNewerOrOlderLabel"  Property="Content" Value="Older"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Foreground" Value="Red"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Content" Value="Older"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Foreground" Value="Green"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Content" Value="Newer"/>
         </DataTrigger>
         <DataTrigger Binding="{Binding LocalNewer}" Value="False">
-          <Setter TargetName="LocalNewerOrOlderLabel"  Property="Foreground" Value="Red"/>
-          <Setter TargetName="LocalNewerOrOlderLabel"  Property="Content" Value="Older"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Foreground" Value="Green"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Content" Value="Newer"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Foreground" Value="Red"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Content" Value="Older"/>
         </DataTrigger>
       </DataTemplate.Triggers>
     </DataTemplate>

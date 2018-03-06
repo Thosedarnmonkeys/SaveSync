@@ -24,6 +24,7 @@ namespace SaveSync.ViewModels
       {
         serverAge = value;
         LocalNewer = ClientAge > ServerAge;
+        ServerAgeString = serverAge == DateTime.MinValue ? "No Data" : serverAge.ToString();
       }
     }
     #endregion
@@ -37,6 +38,7 @@ namespace SaveSync.ViewModels
       {
         clientAge = value;
         LocalNewer = ClientAge > ServerAge;
+        ClientAgeString = clientAge == DateTime.MinValue ? "No Data" : clientAge.ToString();
       }
     }
     #endregion
@@ -50,30 +52,32 @@ namespace SaveSync.ViewModels
 
     // Using a DependencyProperty as the backing store for LocalNewer.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty LocalNewerProperty =
-        DependencyProperty.Register("LocalNewer", typeof(bool), typeof(MainViewModel), new PropertyMetadata(false)); 
+        DependencyProperty.Register("LocalNewer", typeof(bool), typeof(MappingViewModel), new PropertyMetadata(false));
     #endregion
 
+    #region ServerAgeString
     public string ServerAgeString
     {
-      get
-      {
-        if (ServerAge == DateTime.MinValue)
-          return "-";
-
-        return ServerAge.ToString();
-      }
+      get { return (string)GetValue(ServerAgeStringProperty); }
+      set { SetValue(ServerAgeStringProperty, value); }
     }
 
+    // Using a DependencyProperty as the backing store for ServerAgeString.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty ServerAgeStringProperty =
+        DependencyProperty.Register("ServerAgeString", typeof(string), typeof(MappingViewModel), new PropertyMetadata(null));
+    #endregion
+
+    #region ClientAgeString
     public string ClientAgeString
     {
-      get
-      {
-        if (ClientAge == DateTime.MinValue)
-          return "-";
-
-        return ClientAge.ToString();
-      }
+      get { return (string)GetValue(ClientAgeStringProperty); }
+      set { SetValue(ClientAgeStringProperty, value); }
     }
+
+    // Using a DependencyProperty as the backing store for ClientAgeString.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty ClientAgeStringProperty =
+        DependencyProperty.Register("ClientAgeString", typeof(string), typeof(MappingViewModel), new PropertyMetadata(null));
+    #endregion
 
     public DelegateCommand BrowseFolderCommand { get; private set; }
 

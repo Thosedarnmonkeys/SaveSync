@@ -182,33 +182,9 @@ namespace SaveSync.ViewModels
       return results;
     }
 
-    private void UploadFolder(FolderMapping mapping)
-    {
-      if (mapping == null || serverConnection == null || !Connected)
-        return;
-
-      serverConnection.UploadFolder(mapping);
-    }
-
     private void UpdateProgress(int i)
     {
       OperationProgress = i;
-    }
-
-    private async Task Connect()
-    {
-      switch (ConnectionType)
-      {
-        case ConnectionType.Ftp:
-          serverConnection = new FtpServerConnection(Hostname, Username, FileRoot, FtpUsername, FtpPassword, UpdateProgress);
-          break;
-        case ConnectionType.Http:
-          break;
-        default:
-          throw new ArgumentOutOfRangeException();
-      }
-
-      Connected = await serverConnection.TestConnection();
     }
 
     private bool CanConnect()
@@ -252,6 +228,45 @@ namespace SaveSync.ViewModels
         Mappings.Add(vm);
       }
     }
+
+    #region server connection functions
+    private async Task Connect()
+    {
+      switch (ConnectionType)
+      {
+        case ConnectionType.Ftp:
+          serverConnection = new FtpServerConnection(Hostname, Username, FileRoot, FtpUsername, FtpPassword, UpdateProgress);
+          break;
+        case ConnectionType.Http:
+          break;
+        default:
+          throw new ArgumentOutOfRangeException();
+      }
+
+      Connected = await serverConnection.TestConnection();
+      foreach (MappingViewModel mapping in Mappings)
+      {
+        mapping.ServerAge = await GetServerDateTime(mapping.Mapping);
+      }
+    }
+
+    private async Task<DateTime> GetServerDateTime(FolderMapping mapping)
+    {
+      if (mapping == null)
+        return DateTime.MinValue;
+
+      return await serverConnection.LatestSync(mapping);
+    }
+
+    private async Task UploadFolder(FolderMapping mapping)
+    {
+      if (mapping == null || serverConnection == null || !Connected)
+        return;
+
+      await serverConnection.UploadFolder(mapping);
+    }
+
+    #endregion    
     #endregion
   }
 }

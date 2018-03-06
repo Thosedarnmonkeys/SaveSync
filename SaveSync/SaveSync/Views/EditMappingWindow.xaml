@@ -14,6 +14,10 @@
           <Setter Property="Foreground" Value="Red"/>
           <Setter Property="Content" Value="Older"/>
         </DataTrigger>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="False">
+          <Setter Property="Foreground" Value="Green"/>
+          <Setter Property="Content" Value="Newer"/>
+        </DataTrigger>
       </Style.Triggers>
     </Style>
 
@@ -22,6 +26,10 @@
         <DataTrigger Binding="{Binding LocalNewer}" Value="False">
           <Setter Property="Foreground" Value="Red"/>
           <Setter Property="Content" Value="Older"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding LocalNewer}" Value="True">
+          <Setter Property="Foreground" Value="Green"/>
+          <Setter Property="Content" Value="Newer"/>
         </DataTrigger>
       </Style.Triggers>
     </Style>
@@ -64,7 +72,7 @@
         <StackPanel Orientation="Horizontal">
           <Label Content="Local"/>
           <StackPanel Orientation="Vertical">
-            <Label Style="{StaticResource LocalLabelStyle}"  Content="Newer" Foreground="Green"/>
+            <Label Style="{StaticResource LocalLabelStyle}"/>
             <Label Content="{Binding ClientAgeString}"/>
           </StackPanel>
         </StackPanel>
@@ -75,7 +83,7 @@
         <StackPanel Orientation="Horizontal">
           <Label Content="Remote"/>
           <StackPanel Orientation="Vertical">
-            <Label Style="{StaticResource RemoteLabelStyle}" Content="Newer" Foreground="Green"/>
+            <Label Style="{StaticResource RemoteLabelStyle}"/>
             <Label Content="{Binding ServerAgeString}"/>
           </StackPanel>
         </StackPanel>

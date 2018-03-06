@@ -22,14 +22,14 @@ namespace SaveSync.ServerConnection
     private Action<int> progressUpdateAction;
     #endregion
 
-    private string folderRoot => fileRoot + Path.DirectorySeparatorChar + username + Path.DirectorySeparatorChar;
+    private string folderRoot => "/" + fileRoot + "/" + username + "/";
 
     #region constructor
     public FtpServerConnection(string hostname, string username, string fileRoot, string ftpUsername, string ftpPassword, Action<int> progressUpdateAction)
     {
       this.hostname = hostname;
       this.username = username;
-      this.fileRoot = fileRoot;
+      this.fileRoot = fileRoot.Trim(new[] { '/' });
       this.progressUpdateAction = progressUpdateAction;
       client = new FtpClient(hostname);
       client.RetryAttempts = 3;
@@ -51,9 +51,22 @@ namespace SaveSync.ServerConnection
       }
     }
 
-    public Task<DateTime> LatestSync(FolderMapping mapping)
+    public async Task<DateTime> LatestSync(FolderMapping mapping)
     {
-     throw new NotImplementedException(); 
+      if (mapping == null || mapping.FriendlyName == null)
+        return DateTime.MinValue;
+
+      string path = folderRoot + mapping.FriendlyName + "/";
+      if (!await client.DirectoryExistsAsync(path))
+        return DateTime.MinValue;
+
+      FtpListItem[] folders = await client.GetListingAsync(path);
+      if (folders.Length == 0) 
+        return DateTime.MinValue;
+
+      List<DateTime> folderDateTimes = folders.Select(x => DateTimeDirReader.GetDirDateTime(x.Name)).ToList();
+      folderDateTimes.Sort();
+      return folderDateTimes.Last();
     }
 
     public async Task UploadFolder(FolderMapping mapping)
@@ -72,17 +85,17 @@ namespace SaveSync.ServerConnection
       progressUpdateAction.Invoke(100);
     }
 
-    public Task UploadFolders(List<FolderMapping> mappings)
+    public async Task UploadFolders(List<FolderMapping> mappings)
     {
       throw new NotImplementedException();
     }
 
-    public Task DownloadFolder(FolderMapping mapping)
+    public async Task DownloadFolder(FolderMapping mapping)
     {
       throw new NotImplementedException();
     }
 
-    public Task DownloadFolders(List<FolderMapping> mappings)
+    public async Task DownloadFolders(List<FolderMapping> mappings)
     {
       throw new NotImplementedException();
     }
