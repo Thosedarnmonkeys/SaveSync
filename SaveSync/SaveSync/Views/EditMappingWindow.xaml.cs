@@ -25,5 +25,11 @@ namespace SaveSync.Views
       InitializeComponent();
       DataContext = vm;
     }
+
+    private void OkButton_OnClick(object sender, RoutedEventArgs e)
+    {
+      DialogResult = true;
+      Close();
+    }
   }
 }

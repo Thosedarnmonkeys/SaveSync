@@ -61,18 +61,18 @@
         </Grid.ColumnDefinitions>
         <Label Content="{Binding Mapping.FriendlyName}" HorizontalAlignment="Left"/>
         <Label Content="{Binding Mapping.ClientSidePath}" Grid.Column="1" HorizontalAlignment="Left"/>
-        <StackPanel Orientation="Horizontal" Grid.Column="2">
+        <StackPanel Orientation="Horizontal" Grid.Column="2" Margin="0,0,40,0">
           <Label Content="Local" Margin="0,0,5,0"/>
           <StackPanel Orientation="Vertical">
             <Label x:Name="LocalNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
-            <Label Content="{Binding ClientAgeString}"/>
+            <Label Content="{Binding ClientAgeString}" HorizontalAlignment="Center"/>
           </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Grid.Column="3">
           <Label Content="Remote" Margin="0,0,5,0"/>
           <StackPanel Orientation="Vertical">
             <Label x:Name="RemoteNewerOrOlderLabel" Content="Newer" Foreground="Green"/>
-            <Label Content="{Binding ServerAgeString}"/>
+            <Label Content="{Binding ServerAgeString}" HorizontalAlignment="Center"/>
           </StackPanel>
         </StackPanel>
       </Grid>
@@ -134,11 +134,19 @@
     </Grid>
 
     <!--middle section showing folder mappings-->
-    <ListBox Grid.Row="1" ItemsSource="{Binding Mappings}" ItemTemplate="{StaticResource MappingListDateTemplate}" Margin="15"/>
+    <Grid Grid.Row="1" Margin="15" IsEnabled="{Binding Connected}">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+      </Grid.RowDefinitions>
+      <Button Content="Add New.." Command="{Binding NewMappingCommand}" HorizontalAlignment="Left" Margin="5" Padding="5,3"/>
+      <Button Content="Delete" Command="{Binding DeleteMappingCommand}" HorizontalAlignment="Right" Margin="5" Padding="5,3" Background="Firebrick" Foreground="White"/>
+      <ListBox Grid.Row="1" ItemsSource="{Binding Mappings}" ItemTemplate="{StaticResource MappingListDateTemplate}" HorizontalContentAlignment="Stretch"/>
+    </Grid>
 
     <!--bottom section showing progress bar and sync button-->
-    <StackPanel Grid.Row="2">
-
+    <StackPanel Grid.Row="2"  IsEnabled="{Binding Connected}">
+      
     </StackPanel>
   </Grid>
 </Window>

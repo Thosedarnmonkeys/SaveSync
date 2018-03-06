@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -9,6 +10,7 @@ using SaveSync.Config;
 using SaveSync.Mapping;
 using SaveSync.ServerConnection;
 using SaveSync.Utils;
+using SaveSync.Views;
 
 namespace SaveSync.ViewModels
 {
@@ -116,9 +118,13 @@ namespace SaveSync.ViewModels
         DependencyProperty.Register("FtpPassword", typeof(string), typeof(MainViewModel), new PropertyMetadata(null, CriticalPropertyChangedCallback));
     #endregion
 
-    public AsyncDelegateCommand ConnectCommand { get; private set; }
+    #region Commands
+    public AsyncDelegateCommand ConnectCommand { get; private set; } 
+    public DelegateCommand NewMappingCommand { get; private set; }
+    #endregion
 
-    public List<MappingViewModel> Mappings { get; set; }
+
+    public ObservableCollection<MappingViewModel> Mappings { get; set; }
     #endregion
 
     #region constructor
@@ -133,6 +139,7 @@ namespace SaveSync.ViewModels
       Mappings = CreateMappingVms(config.Mappings);
 
       ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
+      NewMappingCommand = new DelegateCommand(AddNewMapping);
     }
     #endregion
 
@@ -157,9 +164,9 @@ namespace SaveSync.ViewModels
     #endregion
 
     #region private methods
-    private List<MappingViewModel> CreateMappingVms(List<FolderMapping> mappings)
+    private ObservableCollection<MappingViewModel> CreateMappingVms(List<FolderMapping> mappings)
     {
-      var results = new List<MappingViewModel>();
+      var results = new ObservableCollection<MappingViewModel>();
 
       if (mappings == null)
         return results;
@@ -232,6 +239,17 @@ namespace SaveSync.ViewModels
       if (o is MainViewModel vm && vm.ConnectCommand != null)
       {
         vm.ConnectCommand.RaiseCanExecuteChanged();
+      }
+    }
+
+    private void AddNewMapping()
+    {
+      var vm = new MappingViewModel();
+      var editWindow = new EditMappingWindow(vm);
+      bool? windowResult = editWindow.ShowDialog();
+      if (windowResult.HasValue && windowResult.Value)
+      {
+        Mappings.Add(vm);
       }
     }
     #endregion

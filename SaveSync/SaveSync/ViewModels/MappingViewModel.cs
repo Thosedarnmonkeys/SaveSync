@@ -4,7 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
+using Microsoft.Win32;
 using SaveSync.Mapping;
+using SaveSync.Utils;
 
 namespace SaveSync.ViewModels
 {
@@ -69,6 +72,24 @@ namespace SaveSync.ViewModels
           return "-";
 
         return ClientAge.ToString();
+      }
+    }
+
+    public DelegateCommand BrowseFolderCommand { get; private set; }
+
+    public MappingViewModel()
+    {
+      BrowseFolderCommand = new DelegateCommand(BrowseForFolder);
+      Mapping = new FolderMapping();
+    }
+
+    private void BrowseForFolder()
+    {
+      using (var fbd = new FolderBrowserDialog())
+      {
+        DialogResult result = fbd.ShowDialog();
+        if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+          Mapping.ClientSidePath = fbd.SelectedPath;
       }
     }
   }
