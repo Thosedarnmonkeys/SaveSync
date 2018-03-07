@@ -21,6 +21,8 @@ namespace SaveSync.ViewModels
     #region public properties
     public FolderMapping Mapping { get; set; }
 
+    public bool IsNewMapping { get; set; }
+
     #region ServerAge
     private DateTime serverAge;
     public DateTime ServerAge
@@ -99,6 +101,14 @@ namespace SaveSync.ViewModels
       UploadFolderCommand = new AsyncDelegateCommand(UploadFolder, CanRunConnectionTasks);
     }
 
+    #endregion
+
+    #region public methods
+
+    public void AddConnection(IServerConnection connection)
+    {
+      this.connection = connection;
+    }
     #endregion
 
     #region private methods

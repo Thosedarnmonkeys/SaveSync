@@ -223,12 +223,15 @@ namespace SaveSync.ViewModels
     private void AddNewMapping()
     {
       var vm = new MappingViewModel();
+      vm.IsNewMapping = true;
       var editWindow = new EditMappingWindow(vm);
       bool? windowResult = editWindow.ShowDialog();
       if (windowResult.HasValue && windowResult.Value)
       {
         Mappings.Add(vm);
       }
+
+      vm.IsNewMapping = false;
     }
 
     private void EditMapping(MappingViewModel vm)
@@ -252,9 +255,14 @@ namespace SaveSync.ViewModels
       }
 
       Connected = await serverConnection.TestConnection();
-      foreach (MappingViewModel mapping in Mappings)
+
+      if (Connected)
       {
-        mapping.ServerAge = await GetServerDateTime(mapping.Mapping);
+        foreach (MappingViewModel mapping in Mappings)
+        {
+          mapping.ServerAge = await GetServerDateTime(mapping.Mapping);
+          mapping.AddConnection(serverConnection);
+        }
       }
     }
 
