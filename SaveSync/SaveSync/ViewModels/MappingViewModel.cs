@@ -16,43 +16,52 @@ namespace SaveSync.ViewModels
   {
     #region private fields
     private IServerConnection connection;
-    #endregion
+		#endregion
 
-    #region public properties
-    public FolderMapping Mapping { get; set; }
+		#region public properties
+		private FolderMapping mapping;
+    public FolderMapping Mapping
+		{
+			get { return mapping; }
+			set
+			{
+				mapping = value;
+				if (mapping == null)
+					return;
+
+				LocalFolderPath = mapping.ClientSidePath;
+				FriendlyName = mapping.FriendlyName;
+			}
+		}
 
     public bool IsNewMapping { get; set; }
 
-    #region ServerAge
-    private DateTime serverAge;
-    public DateTime ServerAge
-    {
-      get { return serverAge; }
-      set
-      {
-        serverAge = value;
-        LocalNewer = ClientAge > ServerAge;
-        ServerAgeString = serverAge == DateTime.MinValue ? "No Data" : serverAge.ToString();
-      }
-    }
-    #endregion
+		#region ServerAge
+		public DateTime ServerAge
+		{
+			get { return (DateTime)GetValue(ServerAgeProperty); }
+			set { SetValue(ServerAgeProperty, value); }
+		}
 
-    #region ClientAge
-    private DateTime clientAge;
-    public DateTime ClientAge
-    {
-      get { return clientAge; }
-      set
-      {
-        clientAge = value;
-        LocalNewer = ClientAge > ServerAge;
-        ClientAgeString = clientAge == DateTime.MinValue ? "No Data" : clientAge.ToString();
-      }
-    }
-    #endregion
+		// Using a DependencyProperty as the backing store for ServerAge.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty ServerAgeProperty =
+				DependencyProperty.Register("ServerAge", typeof(DateTime), typeof(MappingViewModel), new PropertyMetadata(DateTime.MinValue, SetServerAgeCallback));
+		#endregion
 
-    #region LocalNewer
-    public bool LocalNewer
+		#region ClientAge
+		public DateTime ClientAge
+		{
+			get { return (DateTime)GetValue(ClientAgeProperty); }
+			set { SetValue(ClientAgeProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for ClientAge.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty ClientAgeProperty =
+				DependencyProperty.Register("ClientAge", typeof(DateTime), typeof(MappingViewModel), new PropertyMetadata(DateTime.MinValue, SetClientAgeCallback));
+		#endregion
+
+		#region LocalNewer
+		public bool LocalNewer
     {
       get { return (bool)GetValue(LocalNewerProperty); }
       set { SetValue(LocalNewerProperty, value); }
@@ -85,9 +94,35 @@ namespace SaveSync.ViewModels
     // Using a DependencyProperty as the backing store for ClientAgeString.  This enables animation, styling, binding, etc...
     public static readonly DependencyProperty ClientAgeStringProperty =
         DependencyProperty.Register("ClientAgeString", typeof(string), typeof(MappingViewModel), new PropertyMetadata(null));
-    #endregion
+		#endregion
 
-    public DelegateCommand BrowseFolderCommand { get; private set; }
+		#region LocalFolderPath
+		public string LocalFolderPath
+		{
+			get { return (string)GetValue(LocalFolderPathProperty); }
+			set { SetValue(LocalFolderPathProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for LocalFolderPath.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty LocalFolderPathProperty =
+				DependencyProperty.Register("LocalFolderPath", typeof(string), typeof(MappingViewModel), new PropertyMetadata(null, SetMappingLocalFolderPathCallback));
+
+		#endregion
+
+		#region FriendlyName
+		public string FriendlyName
+		{
+			get { return (string)GetValue(FriendlyNameProperty); }
+			set { SetValue(FriendlyNameProperty, value); }
+		}
+
+		// Using a DependencyProperty as the backing store for FriendlyName.  This enables animation, styling, binding, etc...
+		public static readonly DependencyProperty FriendlyNameProperty =
+				DependencyProperty.Register("FriendlyName", typeof(string), typeof(MappingViewModel), new PropertyMetadata(null, SetMappingFriendlyNameCallback));
+		#endregion
+
+
+		public DelegateCommand BrowseFolderCommand { get; private set; }
     public AsyncDelegateCommand DownloadFolderCommand { get; private set; }
     public AsyncDelegateCommand UploadFolderCommand { get; private set; }
     #endregion
@@ -109,6 +144,11 @@ namespace SaveSync.ViewModels
     {
       this.connection = connection;
     }
+
+		public async void UpdateLastSyncTime()
+		{
+			ServerAge = await connection.LatestSync(mapping);
+		}
     #endregion
 
     #region private methods
@@ -118,7 +158,7 @@ namespace SaveSync.ViewModels
       {
         DialogResult result = fbd.ShowDialog();
         if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
-          Mapping.ClientSidePath = fbd.SelectedPath;
+          LocalFolderPath = fbd.SelectedPath;
       }
     }
 
@@ -136,6 +176,46 @@ namespace SaveSync.ViewModels
     {
       return connection != null;
     }
-    #endregion
-  }
+
+
+		#endregion
+
+		#region callbacks
+		private static void SetMappingLocalFolderPathCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		{
+			if (o is MappingViewModel vm)
+			{
+				vm.Mapping.ClientSidePath = (string)e.NewValue;
+			}
+		}
+
+		private static void SetMappingFriendlyNameCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		{
+			if (o is MappingViewModel vm)
+			{
+				vm.Mapping.FriendlyName = (string)e.NewValue;
+			}
+		}
+
+		private static void SetServerAgeCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		{
+			if (o is MappingViewModel vm)
+			{
+				vm.ServerAge = (DateTime)e.NewValue;
+				vm.LocalNewer = vm.ClientAge > vm.ServerAge;
+				vm.ServerAgeString = vm.ServerAge == DateTime.MinValue ? "No Data" : vm.ServerAge.ToString();
+			}
+		}
+
+		private static void SetClientAgeCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+		{
+			if (o is MappingViewModel vm)
+			{
+				vm.ClientAge = (DateTime)e.NewValue;
+				vm.LocalNewer = vm.ClientAge > vm.ServerAge;
+				vm.ClientAgeString = vm.ClientAge == DateTime.MinValue ? "No Data" : vm.ClientAge.ToString();
+			}
+		}
+		#endregion
+	}
 }
