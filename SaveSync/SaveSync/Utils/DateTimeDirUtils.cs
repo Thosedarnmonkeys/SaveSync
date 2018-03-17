@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace SaveSync.Utils
 {
-  public static class DateTimeDirReader
+  public static class DateTimeDirUtils
   {
     public static string DateTimeDirFormat = "yyyy-MM-dd HH;mm";
 
@@ -22,5 +22,10 @@ namespace SaveSync.Utils
 
       return DateTime.MinValue;
     }
+
+		public static string GetDirDateTimeString(DateTime currentTime)
+		{
+			return currentTime.ToString(DateTimeDirFormat);
+		}
   }
 }

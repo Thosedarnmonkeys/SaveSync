@@ -64,7 +64,7 @@ namespace SaveSync.ServerConnection
       if (folders.Length == 0) 
         return DateTime.MinValue;
 
-      List<DateTime> folderDateTimes = folders.Select(x => DateTimeDirReader.GetDirDateTime(x.Name)).ToList();
+      List<DateTime> folderDateTimes = folders.Select(x => DateTimeDirUtils.GetDirDateTime(x.Name)).ToList();
       folderDateTimes.Sort();
       return folderDateTimes.Last();
     }
@@ -74,10 +74,17 @@ namespace SaveSync.ServerConnection
       progressUpdateAction.Invoke(0);
 
       string[] files = Directory.GetFiles(mapping.ClientSidePath, "*", SearchOption.AllDirectories);
-      var stepper = new ProgressBarStepper(files.Length);
-      foreach (string file in files)
+			var filePaths = from f in files
+											select f.Substring(mapping.ClientSidePath.Length).Replace(@"\", "/");
+			string datetimeFolderString = DateTimeDirUtils.GetDirDateTimeString(DateTime.Now);
+			string serverSideFolderPath = folderRoot + mapping.FriendlyName + "/" + datetimeFolderString;
+
+			client.CreateDirectory(serverSideFolderPath);
+
+			var stepper = new ProgressBarStepper(files.Length);
+      foreach (string file in filePaths)
       {
-        string uploadPath = folderRoot + mapping.FriendlyName + Path.DirectorySeparatorChar + file;
+        string uploadPath = serverSideFolderPath + file;
         await client.UploadFileAsync(mapping.ClientSidePath, uploadPath, FtpExists.Overwrite, true, FtpVerify.Retry);
         progressUpdateAction.Invoke(stepper.Step());
       }
@@ -105,6 +112,6 @@ namespace SaveSync.ServerConnection
       await client.DisconnectAsync();
     }
 
-    #endregion
-  }
+		#endregion
+	}
 }
