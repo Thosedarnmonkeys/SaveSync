@@ -120,6 +120,7 @@ namespace SaveSync.ViewModels
 
     #region Commands
     public AsyncDelegateCommand ConnectCommand { get; private set; } 
+    public AsyncDelegateCommand DisconnectCommand { get; private set; } 
     public DelegateCommand NewMappingCommand { get; private set; }
     public DelegateCommand EditMappingCommand { get; private set; }
     public AsyncDelegateCommand SyncCommand { get; private set; }
@@ -141,6 +142,7 @@ namespace SaveSync.ViewModels
       Mappings = CreateMappingVms(config.Mappings);
 
       ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
+      DisconnectCommand = new AsyncDelegateCommand(Disconnect);
       NewMappingCommand = new DelegateCommand(AddNewMapping);
       EditMappingCommand = new DelegateCommand(() => EditMapping(SelectedMapping));
       SyncCommand = new AsyncDelegateCommand(Sync);
@@ -267,6 +269,12 @@ namespace SaveSync.ViewModels
 					mapping.ServerAge = await GetServerDateTime(mapping.Mapping);
         }
       }
+    }
+
+    private async Task Disconnect()
+    {
+      await serverConnection.CloseConnection();
+      Connected = false;
     }
 
     private async Task<DateTime> GetServerDateTime(FolderMapping mapping)
