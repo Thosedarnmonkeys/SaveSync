@@ -285,17 +285,40 @@ namespace SaveSync.ViewModels
       return await serverConnection.LatestSync(mapping);
     }
 
-    private async Task UploadFolder(FolderMapping mapping)
-    {
-      if (mapping == null || serverConnection == null || !Connected)
-        return;
-
-      await serverConnection.UploadFolder(mapping);
-    }
-
     private async Task Sync()
     {
+      var toUpload = new List<FolderMapping>();
+      var toDownload = new List<FolderMapping>();
 
+      foreach (MappingViewModel mapping in Mappings)
+      {
+        if (mapping.LocalNewer)
+          toUpload.Add(mapping.Mapping);
+
+        else
+          toDownload.Add(mapping.Mapping);
+      }
+
+      int totalFiles = 0;
+      foreach (FolderMapping mapping in toUpload)
+      {
+        totalFiles += Directory.GetFiles(mapping.ClientSidePath, "*", SearchOption.AllDirectories).Length;
+      }
+
+      totalFiles += await serverConnection.FileCount(toDownload);
+
+      OperationProgress = 0;
+
+      var stepper = new ProgressBarStepper(totalFiles);
+      await serverConnection.UploadFolders(toUpload, stepper);
+      await serverConnection.DownloadFolders(toDownload, stepper);
+
+      OperationProgress = 100;
+
+      foreach (MappingViewModel mapping in Mappings)
+      {
+        await mapping.UpdateLocalAndServerAge();
+      }
     }
 
     #endregion    

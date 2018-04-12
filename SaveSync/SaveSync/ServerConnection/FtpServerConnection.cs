@@ -79,23 +79,12 @@ namespace SaveSync.ServerConnection
       progressUpdateAction.Invoke(100);
     }
 
-    public async Task UploadFolders(List<FolderMapping> mappings)
+    public async Task UploadFolders(List<FolderMapping> mappings, ProgressBarStepper stepper)
     {
-      progressUpdateAction.Invoke(0);
-
-      int filesTotal = 0;
-      foreach (FolderMapping mapping in mappings)
-      {
-        filesTotal += GetLocalFiles(mapping.ClientSidePath).Length;
-      }
-
-      var stepper = new ProgressBarStepper(filesTotal);
       foreach (FolderMapping mapping in mappings)
       {
         await UploadFolderImpl(mapping, stepper);
       }
-
-      progressUpdateAction.Invoke(100);
     }
 
     public async Task DownloadFolder(FolderMapping mapping)
@@ -108,19 +97,20 @@ namespace SaveSync.ServerConnection
       progressUpdateAction.Invoke(100);
     }
 
-    public async Task DownloadFolders(List<FolderMapping> mappings)
+    public async Task DownloadFolders(List<FolderMapping> mappings, ProgressBarStepper stepper)
     {
-      string[] dirs = mappings.Select(x => x.FriendlyName).ToArray();
-      int totalCount = await GetRemoteFilesCount(dirs);
-      var stepper = new ProgressBarStepper(totalCount);
-
       foreach (FolderMapping mapping in mappings)
       {
         await DownloadFolderImpl(mapping, stepper);
       }
-
-      progressUpdateAction.Invoke(100);
     }
+
+    public async Task<int> FileCount(List<FolderMapping> mappings)
+    {
+      string[] dirs = mappings.Select(x => x.FriendlyName).ToArray();
+      return await GetRemoteFilesCount(dirs);
+    }
+
 
     public async Task CloseConnection()
     {

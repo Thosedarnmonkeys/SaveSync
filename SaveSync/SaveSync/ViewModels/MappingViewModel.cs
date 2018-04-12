@@ -149,6 +149,12 @@ namespace SaveSync.ViewModels
 		{
 			ServerAge = await connection.LatestSync(mapping);
 		}
+
+    public async Task UpdateLocalAndServerAge()
+    {
+      ClientAge = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
+      ServerAge = await connection.LatestSync(mapping);
+    }
     #endregion
 
     #region private methods
@@ -158,7 +164,10 @@ namespace SaveSync.ViewModels
       {
         DialogResult result = fbd.ShowDialog();
         if (result == DialogResult.OK && !string.IsNullOrWhiteSpace(fbd.SelectedPath))
+        {
           LocalFolderPath = fbd.SelectedPath;
+          ClientAge = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
+        }
       }
     }
 
@@ -177,12 +186,6 @@ namespace SaveSync.ViewModels
     private bool CanRunConnectionTasks()
     {
       return connection != null;
-    }
-
-    private async Task UpdateLocalAndServerAge()
-    {
-      ClientAge = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
-      ServerAge = await connection.LatestSync(mapping);
     }
 
     #endregion
