@@ -73,38 +73,53 @@ namespace SaveSync.ServerConnection
     {
       progressUpdateAction.Invoke(0);
 
-      string[] files = Directory.GetFiles(mapping.ClientSidePath, "*", SearchOption.AllDirectories);
-			var filePaths = from f in files
-											select f.Substring(mapping.ClientSidePath.Length).Replace(@"\", "/");
-			string datetimeFolderString = DateTimeDirUtils.GetDirDateTimeString(DateTime.Now);
-			string serverSideFolderPath = folderRoot + mapping.FriendlyName + "/" + datetimeFolderString;
-
-			client.CreateDirectory(serverSideFolderPath);
-
-			var stepper = new ProgressBarStepper(files.Length);
-      foreach (string file in filePaths)
-      {
-        string uploadPath = serverSideFolderPath + file;
-        await client.UploadFileAsync(mapping.ClientSidePath, uploadPath, FtpExists.Overwrite, true, FtpVerify.Retry);
-        progressUpdateAction.Invoke(stepper.Step());
-      }
+      var stepper = new ProgressBarStepper(GetLocalFiles(mapping.ClientSidePath).Length);
+      await UploadFolderImpl(mapping, stepper);
 
       progressUpdateAction.Invoke(100);
     }
 
     public async Task UploadFolders(List<FolderMapping> mappings)
     {
-      throw new NotImplementedException();
+      progressUpdateAction.Invoke(0);
+
+      int filesTotal = 0;
+      foreach (FolderMapping mapping in mappings)
+      {
+        filesTotal += GetLocalFiles(mapping.ClientSidePath).Length;
+      }
+
+      var stepper = new ProgressBarStepper(filesTotal);
+      foreach (FolderMapping mapping in mappings)
+      {
+        await UploadFolderImpl(mapping, stepper);
+      }
+
+      progressUpdateAction.Invoke(100);
     }
 
     public async Task DownloadFolder(FolderMapping mapping)
     {
-      throw new NotImplementedException();
+      progressUpdateAction.Invoke(0); 
+
+      var stepper = new ProgressBarStepper(await GetRemoteFilesCount(mapping));
+      await DownloadFolderImpl(mapping, stepper);
+
+      progressUpdateAction.Invoke(100);
     }
 
     public async Task DownloadFolders(List<FolderMapping> mappings)
     {
-      throw new NotImplementedException();
+      string[] dirs = mappings.Select(x => x.FriendlyName).ToArray();
+      int totalCount = await GetRemoteFilesCount(dirs);
+      var stepper = new ProgressBarStepper(totalCount);
+
+      foreach (FolderMapping mapping in mappings)
+      {
+        await DownloadFolderImpl(mapping, stepper);
+      }
+
+      progressUpdateAction.Invoke(100);
     }
 
     public async Task CloseConnection()
@@ -112,6 +127,114 @@ namespace SaveSync.ServerConnection
       await client.DisconnectAsync();
     }
 
-		#endregion
-	}
+    #endregion
+
+    #region private methods
+
+    private async Task<DateTime> LatestSync(string friendlyName)
+    {
+      string path = folderRoot + friendlyName + "/";
+      if (!await client.DirectoryExistsAsync(path))
+        return DateTime.MinValue;
+
+      FtpListItem[] folders = await client.GetListingAsync(path);
+      if (folders.Length == 0)
+        return DateTime.MinValue;
+
+      List<DateTime> folderDateTimes = folders.Select(x => DateTimeDirUtils.GetDirDateTime(x.Name)).ToList();
+      folderDateTimes.Sort();
+      return folderDateTimes.Last();
+    }
+
+    private async Task UploadFolderImpl(FolderMapping mapping, ProgressBarStepper stepper)
+    {
+      string[] files = GetLocalFiles(mapping.ClientSidePath);
+      var filePaths = from f in files
+                      select f.Substring(mapping.ClientSidePath.Length);
+      string datetimeFolderString = DateTimeDirUtils.GetDirDateTimeString(DateTime.Now);
+      string serverSideFolderPath = folderRoot + mapping.FriendlyName + "/" + datetimeFolderString;
+
+      client.CreateDirectory(serverSideFolderPath);
+
+      foreach (string file in filePaths)
+      {
+        string uploadPath = serverSideFolderPath + file.Replace(@"\", "/");
+        await client.UploadFileAsync(mapping.ClientSidePath + file, uploadPath, FtpExists.Overwrite, true, FtpVerify.Retry);
+        progressUpdateAction.Invoke(stepper.Step());
+      }
+    }
+
+    private async Task DownloadFolderImpl(FolderMapping mapping, ProgressBarStepper stepper)
+    {
+      DateTime latestSync = await LatestSync(mapping);
+      string remotePath = folderRoot + mapping.FriendlyName + "/" + DateTimeDirUtils.GetDirDateTimeString(latestSync) + "/";
+
+      List<FtpListItem> remoteFiles = await client.GetRecursiveListing(remotePath);
+      foreach (FtpListItem file in remoteFiles)
+      {
+        string clientSidePath = mapping.ClientSidePath + @"\" + file.FullName.Substring(remotePath.Length).Replace("/", @"\");
+        await client.DownloadFileAsync(clientSidePath, file.FullName, true, FtpVerify.Retry);
+        progressUpdateAction.Invoke(stepper.Step());
+      }
+    }
+
+    private string[] GetLocalFiles(string clientSidePath)
+    {
+      return Directory.GetFiles(clientSidePath, "*", SearchOption.AllDirectories);
+    }
+
+    private async Task<int> GetRemoteFilesCount(string[] friendlyNames)
+    {
+      for (int i = 0; i < friendlyNames.Length; i++)
+      {
+        DateTime latestSync = await LatestSync(friendlyNames[i]);
+        friendlyNames[i] = folderRoot + friendlyNames[i] + "/" + DateTimeDirUtils.GetDirDateTimeString(latestSync) + "/";
+      }
+
+      List<FtpListItem> files = await client.GetRecursiveListing(friendlyNames);
+      return files.Count;
+    }
+
+    private async Task<int> GetRemoteFilesCount(FolderMapping mapping)
+    {
+      DateTime latestSync = await LatestSync(mapping);
+      string remotePath = folderRoot + mapping.FriendlyName + "/" + DateTimeDirUtils.GetDirDateTimeString(latestSync) + "/";
+
+      List<FtpListItem> files = await client.GetRecursiveListing(remotePath);
+      return files.Count;
+    }
+    #endregion
+  }
+
+  #region extension method class
+  public static class FlientFtpClientExtensionMethods
+  {
+    public static async Task<List<FtpListItem>> GetRecursiveListing(this FtpClient ftpClient, params string[] dirs)
+    {
+      var items = new List<FtpListItem>();
+
+      foreach (string dir in dirs)
+      {
+        foreach (FtpListItem item in ftpClient.GetListing(dir))
+        {
+          switch (item.Type)
+          {
+            case FtpFileSystemObjectType.File:
+              items.Add(item);
+              break;
+            case FtpFileSystemObjectType.Directory:
+              items.AddRange(await GetRecursiveListing(ftpClient, item.FullName));
+              break;
+            case FtpFileSystemObjectType.Link:
+              break;
+            default:
+              throw new ArgumentOutOfRangeException();
+          }
+        }
+      }
+
+      return items;
+    }
+  } 
+  #endregion
 }

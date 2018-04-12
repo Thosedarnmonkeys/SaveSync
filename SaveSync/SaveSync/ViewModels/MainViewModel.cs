@@ -122,6 +122,7 @@ namespace SaveSync.ViewModels
     public AsyncDelegateCommand ConnectCommand { get; private set; } 
     public DelegateCommand NewMappingCommand { get; private set; }
     public DelegateCommand EditMappingCommand { get; private set; }
+    public AsyncDelegateCommand SyncCommand { get; private set; }
     #endregion
 
     public MappingViewModel SelectedMapping { get; set; }
@@ -142,6 +143,7 @@ namespace SaveSync.ViewModels
       ConnectCommand = new AsyncDelegateCommand(Connect, CanConnect);
       NewMappingCommand = new DelegateCommand(AddNewMapping);
       EditMappingCommand = new DelegateCommand(() => EditMapping(SelectedMapping));
+      SyncCommand = new AsyncDelegateCommand(Sync);
     }
     #endregion
 
@@ -281,6 +283,11 @@ namespace SaveSync.ViewModels
         return;
 
       await serverConnection.UploadFolder(mapping);
+    }
+
+    private async Task Sync()
+    {
+
     }
 
     #endregion    
