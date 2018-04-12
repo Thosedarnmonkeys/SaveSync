@@ -9,7 +9,7 @@ namespace SaveSync.Utils
 {
   public static class DateTimeDirUtils
   {
-    public static string DateTimeDirFormat = "yyyy-MM-dd HH;mm";
+    public static string DateTimeDirFormat = "yyyy-MM-dd HH;mm;ss";
 
     public static DateTime GetDirDateTime(string dirname)
     {

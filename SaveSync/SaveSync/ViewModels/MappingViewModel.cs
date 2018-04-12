@@ -165,11 +165,13 @@ namespace SaveSync.ViewModels
     private async Task DownloadFolder()
     {
       await connection.DownloadFolder(Mapping);
+      await UpdateLocalAndServerAge();
     }
 
     private async Task UploadFolder()
     {
       await connection.UploadFolder(Mapping);
+      await UpdateLocalAndServerAge();
     }
 
     private bool CanRunConnectionTasks()
@@ -177,11 +179,16 @@ namespace SaveSync.ViewModels
       return connection != null;
     }
 
+    private async Task UpdateLocalAndServerAge()
+    {
+      ClientAge = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
+      ServerAge = await connection.LatestSync(mapping);
+    }
 
-		#endregion
+    #endregion
 
-		#region callbacks
-		private static void SetMappingLocalFolderPathCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
+    #region callbacks
+    private static void SetMappingLocalFolderPathCallback(DependencyObject o, DependencyPropertyChangedEventArgs e)
 		{
 			if (o is MappingViewModel vm)
 			{
