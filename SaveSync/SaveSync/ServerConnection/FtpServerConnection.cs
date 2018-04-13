@@ -141,7 +141,8 @@ namespace SaveSync.ServerConnection
       string[] files = GetLocalFiles(mapping.ClientSidePath);
       var filePaths = from f in files
                       select f.Substring(mapping.ClientSidePath.Length);
-      string datetimeFolderString = DateTimeDirUtils.GetDirDateTimeString(DateTime.Now);
+      DateTime uploadDateTime = DirUtils.GetLatestFileWriteTimeInDir(mapping.ClientSidePath);
+      string datetimeFolderString = DateTimeDirUtils.GetDirDateTimeString(uploadDateTime);
       string serverSideFolderPath = folderRoot + mapping.FriendlyName + "/" + datetimeFolderString;
 
       client.CreateDirectory(serverSideFolderPath);
@@ -164,6 +165,7 @@ namespace SaveSync.ServerConnection
       {
         string clientSidePath = mapping.ClientSidePath + @"\" + file.FullName.Substring(remotePath.Length).Replace("/", @"\");
         await client.DownloadFileAsync(clientSidePath, file.FullName, true, FtpVerify.Retry);
+        File.SetLastWriteTime(clientSidePath, latestSync);
         progressUpdateAction.Invoke(stepper.Step());
       }
     }

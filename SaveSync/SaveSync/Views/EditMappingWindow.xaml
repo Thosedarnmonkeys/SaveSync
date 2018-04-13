@@ -18,6 +18,10 @@
           <Setter Property="Foreground" Value="Green"/>
           <Setter Property="Content" Value="Newer"/>
         </DataTrigger>
+        <DataTrigger Binding="{Binding InSync}" Value="True">
+          <Setter Property="Foreground" Value="Gray"/>
+          <Setter Property="Content" Value="In Sync"/>
+        </DataTrigger>
       </Style.Triggers>
     </Style>
 
@@ -30,6 +34,10 @@
         <DataTrigger Binding="{Binding LocalNewer}" Value="True">
           <Setter Property="Foreground" Value="Green"/>
           <Setter Property="Content" Value="Newer"/>
+        </DataTrigger>
+        <DataTrigger Binding="{Binding InSync}" Value="True">
+          <Setter Property="Foreground" Value="Gray"/>
+          <Setter Property="Content" Value="In Sync"/>
         </DataTrigger>
       </Style.Triggers>
     </Style>

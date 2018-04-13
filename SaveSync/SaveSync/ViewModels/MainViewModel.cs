@@ -292,6 +292,9 @@ namespace SaveSync.ViewModels
 
       foreach (MappingViewModel mapping in Mappings)
       {
+        if (mapping.InSync)
+          continue;
+
         if (mapping.LocalNewer)
           toUpload.Add(mapping.Mapping);
 

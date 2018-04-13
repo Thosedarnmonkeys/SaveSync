@@ -93,6 +93,12 @@
           <Setter TargetName="LocalNewerOrOlderLabel" Property="Foreground" Value="Red"/>
           <Setter TargetName="LocalNewerOrOlderLabel" Property="Content" Value="Older"/>
         </DataTrigger>
+        <DataTrigger Binding="{Binding InSync}" Value="True">
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Foreground" Value="Gray"/>
+          <Setter TargetName="RemoteNewerOrOlderLabel" Property="Content" Value="In Sync"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Foreground" Value="Gray"/>
+          <Setter TargetName="LocalNewerOrOlderLabel" Property="Content" Value="In Sync"/>
+        </DataTrigger>
       </DataTemplate.Triggers>
     </DataTemplate>
 

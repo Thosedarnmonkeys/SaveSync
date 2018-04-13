@@ -72,6 +72,18 @@ namespace SaveSync.ViewModels
         DependencyProperty.Register("LocalNewer", typeof(bool), typeof(MappingViewModel), new PropertyMetadata(false));
     #endregion
 
+    #region InSync
+    public bool InSync
+    {
+      get { return (bool)GetValue(InSyncProperty); }
+      set { SetValue(InSyncProperty, value); }
+    }
+
+    // Using a DependencyProperty as the backing store for InSync.  This enables animation, styling, binding, etc...
+    public static readonly DependencyProperty InSyncProperty =
+        DependencyProperty.Register("InSync", typeof(bool), typeof(MappingViewModel), new PropertyMetadata(false)); 
+    #endregion
+
     #region ServerAgeString
     public string ServerAgeString
     {
@@ -213,7 +225,8 @@ namespace SaveSync.ViewModels
 			{
 				vm.ServerAge = (DateTime)e.NewValue;
 				vm.LocalNewer = vm.ClientAge > vm.ServerAge;
-				vm.ServerAgeString = vm.ServerAge == DateTime.MinValue ? "No Data" : vm.ServerAge.ToString();
+			  vm.InSync = vm.ClientAge.TrimToSeconds() == vm.ServerAge.TrimToSeconds();
+        vm.ServerAgeString = vm.ServerAge == DateTime.MinValue ? "No Data" : vm.ServerAge.ToString();
 			}
 		}
 
@@ -223,9 +236,18 @@ namespace SaveSync.ViewModels
 			{
 				vm.ClientAge = (DateTime)e.NewValue;
 				vm.LocalNewer = vm.ClientAge > vm.ServerAge;
+			  vm.InSync = vm.ClientAge.TrimToSeconds() == vm.ServerAge.TrimToSeconds();
 				vm.ClientAgeString = vm.ClientAge == DateTime.MinValue ? "No Data" : vm.ClientAge.ToString();
 			}
 		}
 		#endregion
 	}
+
+  public static class DateTimeExtensions
+  {
+    public static DateTime TrimToSeconds(this DateTime dt)
+    {
+      return new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, dt.Second);
+    }
+  }
 }
